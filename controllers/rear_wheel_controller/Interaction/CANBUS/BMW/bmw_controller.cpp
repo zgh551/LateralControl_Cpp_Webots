@@ -80,10 +80,7 @@ double BMWController::SteeringAngleControl(double wheel_angle)
     {
         wheel_angle = getSteeringAngleSet() - getSteeringAngleRate();
     }
-    else
-    {
-        setSteeringAngleSet(wheel_angle);
-    }
+    setSteeringAngleSet(wheel_angle);
     return wheel_angle;
 }
 // void BMWController::SteeringAngleControl(float dt)

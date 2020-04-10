@@ -18,6 +18,11 @@
 
 MessageManager::MessageManager() {
     // wheel speed
+    _vehicle_middle_speed = 0.0f;
+    _steering_angle = 0.0f;
+    _steering_angle_rate = 0.0f;
+    _gear = Parking;
+
 }
 
 MessageManager::~MessageManager() {
