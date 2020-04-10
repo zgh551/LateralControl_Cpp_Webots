@@ -22,6 +22,7 @@
 #include "VehicleState/GeometricTrack/geometric_track.h"
 #include "Planning/Curvature/curvature.h"
 #include "Control/LatControl/lat_control_lqr.h"
+#include "Control/LatControl/lat_control.h"
 #include "Control/Common/trajectory_analyzer.h"
 
 // All the webots classes are defined in the "webots" namespace
@@ -30,9 +31,9 @@
  */
 using namespace webots;
 // using namespace math;
-
+#define RED   0x880000
 #define GREEN 0x008800
-
+#define BLUE  0x000088
 /**
  * @brief Driver Objecter
  */
@@ -62,6 +63,7 @@ std::vector<TargetTrack> *wb_target_curvature_vectors;
 TrajectoryAnalyzer *wb_trajectory_analyzer;
 
 LatControl_LQR *wb_lat_control_lqr;
+LatControl *wb_lat_control;
 
 VehicleConfig *wb_vehicle_configure;
 /**
@@ -90,6 +92,9 @@ void Init(void)
 
   wb_lat_control_lqr = new LatControl_LQR();
   wb_lat_control_lqr->Init(wb_vehicle_configure);
+
+  wb_lat_control = new LatControl();
+  // wb_lat_control->Init();
 }
 
 /**
@@ -99,10 +104,19 @@ void Init(void)
  */
 void UpdateDispaly(BMWMessage *msg,GeometricTrack *ps)
 {
-  char txt[64];
-  sprintf(txt,"X:%f  Y:%f  Yaw:%f  V:%f  Steering:%f\r\n",ps->getPosition().getX(),ps->getPosition().getY(),ps->getYaw(),
-                                                          msg->getVehicleMiddleSpeed(),msg->getSteeringAngle());
-  car->setLabel(5,txt,0.05,0.95,0.07,GREEN,0,"Arial");
+  char txt[128];
+  sprintf(txt,"X:%.2f[m]  Y:%.2f[m]  Yaw:%.2f[rad] ",ps->getPosition().getX(),ps->getPosition().getY(),ps->getYaw());
+  car->setLabel(0,txt,0.05,0.95,0.07,GREEN,0,"Arial");
+
+  sprintf(txt,"Speed:%.2f[m/s]  Steering:%.2f[deg]",msg->getVehicleMiddleSpeed()/3.6,-msg->getSteeringAngle()*16.0*57.3);
+  car->setLabel(1,txt,0.05,0.91,0.07,BLUE,0,"Arial");
+
+  // sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control_lqr->getLatError()->getLateralError()*100,
+  //                                                 wb_lat_control_lqr->getLatError()->getHeadingError()*57.3);
+  sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control->getErrCro() *100 ,
+                                                      wb_lat_control->getErrYaw() *57.3);
+                                                  
+  car->setLabel(2,txt,0.05,0.87,0.07,RED,0,"Arial");
 }
 
 /** 
@@ -111,10 +125,11 @@ void UpdateDispaly(BMWMessage *msg,GeometricTrack *ps)
  */
 void GetVehicleMessage(BMWMessage *msg)
 {
-  msg->setVehicleMiddleSpeed(car->getCurrentSpeed()*0.27778);
-  msg->setSteeringAngle(car->getSteeringAngle()*16.0*57.3);
+  printf("speed:%f\r\n",car->getCurrentSpeed());
+  msg->setVehicleMiddleSpeed(car->getCurrentSpeed());
+  msg->setSteeringAngle(car->getSteeringAngle());
 
-  printf("wheel_base:%f\r\n",car->getWheelbase());
+  // printf("wheel_base:%f\r\n",car->getWheelbase());
   // if(car->getGear() == 0)
   // {
     msg->setGear(Drive);
@@ -143,13 +158,18 @@ void GetVehicleLocation(GeometricTrack *ps)
  */
 void SetVehicleInformation(BMWController *ctl)
 {
-
   car->setCruisingSpeed(ctl->getVelocity());
   car->setSteeringAngle(ctl->SteeringAngleControl(ctl->getSteeringAngle()));
   car->setBrakeIntensity(0.0);
   printf("control steering:%f\r\n",ctl->getSteeringAngle());
 }
 
+void VehicleInit()
+{
+  car->setCruisingSpeed(0.0);
+  car->setSteeringAngle(0.0);
+  car->setBrakeIntensity(0.0);
+}
 // This is the main program of your controller.
 // It creates an instance of your Robot instance, launches its
 // function(s) and destroys it at the end of the execution.
@@ -164,6 +184,7 @@ int main(int argc, char **argv) {
   // init relation variable
   Init();
 
+  VehicleInit();
   // gennerate target curvature
   wb_target_curvature->GenerateCurvaturePointSets(wb_target_curvature_vectors,3);
 
@@ -194,9 +215,9 @@ int main(int argc, char **argv) {
     GetVehicleMessage(wb_bmw_message);
     GetVehicleLocation(wb_bmw_track);
     // Process sensor data here.
-    wb_lat_control_lqr->ComputeControlCommand(wb_bmw_track,wb_bmw_message,*wb_trajectory_analyzer,wb_bmw_controller);
+    // wb_lat_control_lqr->ComputeControlCommand(wb_bmw_track,wb_bmw_message,*wb_trajectory_analyzer,wb_bmw_controller);
+    wb_lat_control->Work(wb_bmw_message,wb_bmw_controller,wb_bmw_track,wb_trajectory_analyzer);
     // Enter here functions to send actuator commands, like:
-    //  motor->setPosition(10.0);
     SetVehicleInformation(wb_bmw_controller);
     UpdateDispaly(wb_bmw_message,wb_bmw_track);
   };

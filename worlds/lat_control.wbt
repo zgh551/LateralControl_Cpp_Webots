@@ -49,8 +49,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 0.785408
-  orientation 0.990531217340416 0.11842513891553953 0.06945065836223914 5.2140665634899115
-  position -11.380842327634316 156.05646037653995 86.55634464146088
+  orientation 0.03165176535978187 -0.9814369722937858 -0.18915505587854586 3.4671390872441785
+  position 3.4724896091025137 6.965381835931594 -10.541203089660158
   near 1
   follow "vehicle"
   followSmoothness 0
@@ -64,7 +64,7 @@ Fog {
   visibilityRange 1000
 }
 DEF BMW BmwX5 {
-  translation 0 0.440622 0
+  translation 0 0.39062 0
   color 0 0.333333 0.498039
   controller "rear_wheel_controller"
   supervisor TRUE
@@ -126,30 +126,29 @@ DEF BMW BmwX5 {
   ]
 }
 StraightRoadSegment {
-  translation 9 0.02 8
-  rotation 0 1 0 1.5708
-  name "road_straight(1)"
-  id "1"
+  translation 0 0.02 -8
+  name "road_straight"
+  id "0"
   startJunction "0"
-  endJunction "2"
+  endJunction "1"
   width 5
   lines [
     RoadLine {
-      type "none"
+      color 1 1 0
+      type "continuous"
     }
   ]
   roadBorderHeight 0.1
   rightBarrier TRUE
   leftBarrier TRUE
-  length 20
+  length 8
 }
 CurvedRoadSegment {
-  translation 29 0.02 16
-  rotation 0 1 0 1.5707996938995747
+  translation -10 0.02 0
   name "road2"
-  id "2"
-  startJunction "0"
-  endJunction "1"
+  id "1"
+  startJunction "1"
+  endJunction "2"
   width 5
   lines [
     RoadLine {
@@ -160,7 +159,95 @@ CurvedRoadSegment {
   roadBorderHeight 0.35
   rightBarrier TRUE
   leftBarrier TRUE
-  curvatureRadius 8
+}
+CurvedRoadSegment {
+  translation -10 0.02 0
+  rotation 0 1 0 -1.5707996938995747
+  name "road2(1)"
+  id "2"
+  startJunction "1"
+  endJunction "3"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
+}
+CurvedRoadSegment {
+  translation -10 0.02 0
+  rotation 0 1 0 -3.141592653589793
+  name "road2(2)"
+  id "3"
+  startJunction "4"
+  endJunction "2"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
+}
+CurvedRoadSegment {
+  translation -10 0.02 -20
+  name "road2(3)"
+  id "4"
+  startJunction "5"
+  endJunction "3"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
+}
+CurvedRoadSegment {
+  translation -10 0.02 -20
+  rotation 0 1 0 1.5707996938995747
+  name "road2(4)"
+  id "5"
+  startJunction "6"
+  endJunction "4"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
+}
+CurvedRoadSegment {
+  translation -10 0.02 -20
+  rotation 0 1 0 3.141592653589793
+  name "road2(5)"
+  id "6"
+  startJunction "6"
+  endJunction "5"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
 }
 Robot {
   children [
@@ -192,9 +279,9 @@ Robot {
   supervisor TRUE
 }
 Floor {
-  translation 48 0.01 0
-  size 80 80
-  tileSize 80 80
+  translation -9 0.01 0
+  size 5 5
+  tileSize 5 5
 }
 DEF TARGET_PEN Robot {
   children [
@@ -226,26 +313,4 @@ DEF TARGET_PEN Robot {
   boundingObject USE G_SHAPE
   controller "target_pen_controller"
   supervisor TRUE
-}
-Solid {
-  children [
-    Transform {
-      translation 0 0.01 0
-      children [
-        DEF SolidFloor Shape {
-          appearance PBRAppearance {
-            baseColorMap ImageTexture {
-              url [
-                "textures/texture_grid.png"
-              ]
-            }
-          }
-          geometry Plane {
-            size 50 50
-          }
-        }
-      ]
-    }
-  ]
-  boundingObject USE SolidFloor
 }
