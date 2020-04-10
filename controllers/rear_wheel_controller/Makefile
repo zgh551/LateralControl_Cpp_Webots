@@ -75,6 +75,7 @@ CXX_SOURCES += rear_wheel_controller.cpp
 
 CXX_SOURCES += Configure/Configs/vehicle_config.cpp
 CXX_SOURCES += Math/vector_2d.cpp Math/linear_quadratic_regulator.cpp Math/math_utils.cpp
+CXX_SOURCES += Filter/digital_filter.cpp Filter/digital_filter_coefficients.cpp
 
 CXX_SOURCES += Interaction/CANBUS/Interface/message_manager.cpp Interaction/CANBUS/Interface/vehicle_controller.cpp
 CXX_SOURCES += Interaction/CANBUS/BMW/bmw_controller.cpp Interaction/CANBUS/BMW/bmw_message.cpp
@@ -86,13 +87,7 @@ CXX_SOURCES += Planning/Curvature/curvature.cpp
 
 CXX_SOURCES += Control/Interface/controller.cpp
 CXX_SOURCES += Control/Common/trajectory_analyzer.cpp
-CXX_SOURCES += Control/LatControl/lat_control_lqr.cpp
-
-
-
-
-
-
+CXX_SOURCES += Control/LatControl/lat_control_lqr.cpp Control/LatControl/lat_control.cpp
 
 
 LIBRARIES = -ldriver -lcar -lCppDriver -lCppCar
