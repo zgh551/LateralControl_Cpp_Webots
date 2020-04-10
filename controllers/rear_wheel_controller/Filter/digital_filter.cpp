@@ -27,12 +27,12 @@ void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
 
 void DigitalFilter::set_dead_zone(const double deadzone) {
   dead_zone_ = std::fabs(deadzone);
-  qDebug() << "Setting digital filter dead zone = " << dead_zone_;
+  printf("Setting digital filter dead zone = %f\r\n",dead_zone_);
 }
 
 double DigitalFilter::Filter(const double x_insert) {
   if (denominators_.empty() || numerators_.empty()) {
-    qDebug() << "Empty denominators or numerators";
+    printf("Empty denominators or numerators\r\n");
     return 0.0;
   }
 
@@ -49,6 +49,7 @@ double DigitalFilter::Filter(const double x_insert) {
   if (std::fabs(denominators_.front()) > kDoubleEpsilon) {
     y_insert = (xside - yside) / denominators_.front();
   }
+
   y_values_.push_front(y_insert);
 
   return UpdateLast(y_insert);

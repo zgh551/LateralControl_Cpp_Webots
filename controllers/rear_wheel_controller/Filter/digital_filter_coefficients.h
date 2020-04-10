@@ -1,8 +1,8 @@
 #ifndef DIGITALFILTERCOEFFICIENTS_H
 #define DIGITALFILTERCOEFFICIENTS_H
 
-#include <QMainWindow>
-#include "Common/Configure/Configs/system_config.h"
+#include <vector>
+#include "../Configure/Configs/system_config.h"
 #include "math.h"
 
 namespace common {

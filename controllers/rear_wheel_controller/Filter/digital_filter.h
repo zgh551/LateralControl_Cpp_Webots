@@ -1,13 +1,12 @@
 #ifndef DIGITALFILTER_H
 #define DIGITALFILTER_H
 
-#include <QMainWindow>
 #include <deque>
 #include <vector>
-#include <QDebug>
 
-#include "Common/Configure/Configs/system_config.h"
+#include "../Configure/Configs/system_config.h"
 #include "math.h"
+#include <stdio.h>
 
 namespace common {
 
