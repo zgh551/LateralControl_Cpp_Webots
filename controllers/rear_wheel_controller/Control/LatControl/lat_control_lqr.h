@@ -121,6 +121,8 @@ public:
     void ComputeControlCommand(GeometricTrack *act_track, MessageManager *msg, TrajectoryAnalyzer track, VehicleController *ctl);
 
     void Work(MessageManager *msg, GeometricTrack *a_track, TrajectoryAnalyzer track, VehicleController *ctl);
+
+    LateralErr* getLatError();
 private:
     MessageManager *_message_manager;
     GeometricTrack *_vehicle_track;
@@ -193,6 +195,8 @@ private:
 
     LatControl_LQR_Status _lat_control_lqr_status;
     float last_cross_err;
+
+    LateralErr *_lat_error;
 };
 
 #endif // LATCONTROL_LQR_H

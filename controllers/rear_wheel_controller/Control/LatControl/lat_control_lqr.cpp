@@ -5,6 +5,7 @@ using namespace math;
 
 LatControl_LQR::LatControl_LQR()
 {
+    _lat_error = new LateralErr();
     _lat_control_lqr_status = lqr_init_status;
 }
 
@@ -246,6 +247,7 @@ void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const 
     Vector2d vec_a,vec_d,vec_t;
 
     target_point = trajectory_analyzer.CalculateNearestPointByPosition(x,y);
+    printf("target point x %f y %f \r\n",target_point.point.getX(),target_point.point.getY());
 
     vec_a.setX(static_cast<float>(x));
     vec_a.setY(static_cast<float>(y));
@@ -256,6 +258,7 @@ void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const 
     vec_t.setY(sinf(static_cast<float>(target_point.yaw)));
 
     float lateral_error = vec_t.CrossProduct(vec_d);
+    printf("lat error:%f",lateral_error);
 
     error->setLateralError(static_cast<double>(lateral_error));
 
@@ -268,9 +271,9 @@ void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const 
 
     //error first dot
     // base on the actual velocity
-    error->setLateralErrorRate(linear_v * sin(error->getHeadingError()));
+    // error->setLateralErrorRate(linear_v * sin(error->getHeadingError()));
     // base on last error value calculate the dot
-//    error->setLateralErrorRate((error->getLateralError() - _previous_lateral_error) / _ts);
+   error->setLateralErrorRate((error->getLateralError() - _previous_lateral_error) / _ts);
     error->setHeadingErrorRate((error->getHeadingError() - _previous_heading_error) / _ts);
 
     _previous_lateral_error = error->getLateralError();
@@ -281,7 +284,7 @@ void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const 
 
 void LatControl_LQR::ComputeControlCommand(GeometricTrack *act_track,MessageManager *msg, TrajectoryAnalyzer track,VehicleController *ctl)
 {
-    LateralErr *error = new LateralErr();
+    
 
     _vehicle_track          = act_track;
     _message_manager        = msg;
@@ -290,21 +293,21 @@ void LatControl_LQR::ComputeControlCommand(GeometricTrack *act_track,MessageMana
     KinematicsModuleUpdate();
     // DynamicsModuleUpdate();
 
-    UpdateState(error);
-    UpdateMatrix(error->getCurvature());
+    UpdateState(_lat_error);
+    UpdateMatrix(_lat_error->getCurvature());
 
     math::SolveLQR(_matrix_ad,_matrix_bd,_matrix_q,_matrix_r,_lqr_eps,_lqr_max_iteration,&_matrix_k);
 
     // feedback = - K * state
     const double steer_angle_feedback = -(_matrix_k *_matrix_state)(0,0);
-    const double steer_angle_feedforward = ComputeFeedForward(error->getCurvature());
+    const double steer_angle_feedforward = ComputeFeedForward(_lat_error->getCurvature());
 
     double steer_angle = steer_angle_feedback + steer_angle_feedforward;
 
     steer_angle = math::Clamp(steer_angle,-_max_steer_angle,_max_steer_angle);
     ctl->setSteeringAngle(static_cast<float>(-steer_angle));
     ctl->setSteeringAngleRate(static_cast<float>(_max_steer_angle_rate));
-    ctl->setVelocity(10.0);
+    ctl->setVelocity(10);
 }
 
 void LatControl_LQR::Work(MessageManager *msg, GeometricTrack *a_track, TrajectoryAnalyzer track, VehicleController *ctl)
@@ -358,6 +361,8 @@ void LatControl_LQR::Work(MessageManager *msg, GeometricTrack *a_track, Trajecto
             break;
     }
 }
+
+LateralErr* LatControl_LQR::getLatError() {return _lat_error;}
 
 void   LateralErr::setRefHeading(double value)  {_ref_heading = value;}
 double LateralErr::getRefHeading()              {return  _ref_heading;}

@@ -5,14 +5,14 @@
  *      Author: zhuguohua
  */
 
-#include "Control/LatControl/lat_control.h"
+#include "lat_control.h"
 
+using namespace math;
 
 
 LatControl::LatControl() {
 	// TODO Auto-generated constructor stub
     Init();
-
 }
 
 LatControl::~LatControl() {
@@ -23,32 +23,15 @@ void LatControl::Init()
 {
     std::vector<double> den(3, 0.0);
     std::vector<double> num(3, 0.0);
-
-    last_cross_err = 0.0f;
+    _last_cross_err = 0.0f;
 	_lat_control_status = init_status;
-    common::LpfCoefficients(0.02,5,&den, &num);
-    _digital_filter.set_coefficients(den, num);
+    common::LpfCoefficients(0.02,10,&den, &num);
+    _digital_filter = common::DigitalFilter(den, num);
 }
 
 void LatControl::Proc(MessageManager *msg,VehicleController *ctl,PID *pid)
 {
-	if(ctl->SteeringEnable)
-	{
-		ctl->SteeringAngle = 0;
-	}
-}
 
-float LatControl::pi2pi(float angle)
-{
-    while(angle > M_PI)
-    {
-        angle = angle - 2*M_PI;
-    }
-    while(angle < -M_PI)
-    {
-        angle = angle + 2*M_PI;
-    }
-    return angle;
 }
 
 /**
@@ -130,7 +113,6 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
 	else
 	{
         rote_angle = 0;
-        APA_DEBUG("Warn:angle over the range!");
         return;
 	}
 
@@ -173,8 +155,8 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
 	delta_ctl = atanf(temp_a * temp_b);
 
     delta_ctl = delta_ctl > 0.54f ? 0.54f : delta_ctl < -0.54f ? -0.54f:delta_ctl;
-    ctl->SteeringAngle 		= _digital_filter.Filter( delta_ctl * 16 * 57.3f);
-	ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+    ctl->setSteeringAngle(_digital_filter.Filter( delta_ctl * 16 * 57.3f));
+	ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 }
 
 /**
@@ -191,51 +173,52 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
  */
 void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
 {
-    float err_yaw=0.0f,err_cro=0.0f;
 	Vector2d vec_d,vec_t;
-	float psi_omega;
+	float psi_omega = 0.0f;
     float v_x = 0.0f,k = 0.0f;
-	float delta_ctl;
+	float delta_ctl = 0.0f;
 
     vec_d = a_track->getPosition() - t_track.point;
 
     if(Drive == msg->getGear())
     {
         vec_t = Vector2d(cosf(t_track.yaw),sinf(t_track.yaw));
-        err_yaw = pi2pi(a_track->getYaw() - t_track.yaw);
+        _err_yaw = math::NormallizeAngle(a_track->getYaw() - t_track.yaw);
         v_x = msg->getVehicleMiddleSpeed();
         k =  t_track.curvature;
     }
     else if(Reverse == msg->getGear())
     {
         vec_t = Vector2d(cosf(t_track.yaw + M_PI),sinf(t_track.yaw + M_PI));
-        err_yaw = pi2pi(a_track->getYaw() - t_track.yaw - M_PI);
+        _err_yaw = math::NormallizeAngle(a_track->getYaw() - t_track.yaw - M_PI);
         v_x = msg->getVehicleMiddleSpeed();
         k = -t_track.curvature;
     }
     else
     {
         vec_t = Vector2d(0.0f,0.0f);
-        err_yaw = 0.0f;
+        _err_yaw = 0.0f;
         v_x = 0.0f;
     }
-    err_cro = vec_t.CrossProduct(vec_d);
+    _err_cro = vec_t.CrossProduct(vec_d);
+    psi_omega = v_x * k * cosf(_err_yaw)/(1.0f - k * _err_cro)
+              - COEFFICIENT_KE   * v_x  * sinf(_err_yaw) * _err_cro / _err_yaw
+              - COEFFICIENT_KPSI * fabs(v_x) * _err_yaw;
 
-    psi_omega = v_x * k * cosf(err_yaw)/(1.0f - k * err_cro)
-              - COEFFICIENT_KE   * v_x  * sinf(err_yaw) * err_cro / err_yaw
-              - COEFFICIENT_KPSI * fabs(v_x) * err_yaw;
-
-	if(fabs(psi_omega) < 1.0e-6f || fabs(err_yaw) < 1.0e-6f)
+	if(fabs(psi_omega) < 1.0e-6f || fabs(_err_yaw) < 1.0e-6f)
 	{
-		ctl->SteeringAngle 		= 0.0f;
-		ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+		ctl->setSteeringAngle(0.0f);
+		ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 	}
 	else
 	{
         delta_ctl = atanf(psi_omega * WHEEL_BASE / v_x);
-        delta_ctl = delta_ctl > 0.54f ? 0.54f : delta_ctl < -0.54f ? -0.54f:delta_ctl;
-        ctl->SteeringAngle 		= _digital_filter.Filter(delta_ctl * 16 * 57.3f);
-		ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+        delta_ctl = delta_ctl > 0.6 ? 0.6 : delta_ctl < -0.6 ? -0.6:delta_ctl;
+
+        ctl->setSteeringAngle(-_digital_filter.Filter(delta_ctl));
+		// ctl->setSteeringAngle(-delta_ctl);
+
+		ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 	}
 }
 
@@ -248,56 +231,51 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
  * @param t_track：目标曲线信息
  * @param last_track：车辆终点信息
  */
-void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track,TargetTrack last_track)
+void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TrajectoryAnalyzer *track_aly)
 {
     float nerest_distance;
-    float cross_err;
+	float init_steering;
+	TargetTrack temp_track = track_aly->CalculateNearestPointByPosition(a_track->getPosition().getX() ,
+																		a_track->getPosition().getY());
 	switch(_lat_control_status)
 	{
 		case init_status:
-			if(ctl->getAPAEnable() && (msg->getSteeringAngle() < 5.0f) && (msg->getSteeringAngle() > -5.0f))
+			init_steering = atan(WHEEL_BASE*temp_track.curvature);
+			ctl->setVelocity(0.0);
+			ctl->setGear(Parking);
+			if((msg->getSteeringAngle() < (-init_steering + 0.1f)) && (msg->getSteeringAngle() > (-init_steering - 0.1f)))
 			{
-                a_track->Init(); // 跟踪位置初始化，从坐标零点开始控制
+				printf("steering angle arrive\r\n");
 				_lat_control_status = process_status;
 			}
 			else
 			{
-				ctl->SteeringAngle 		= 0;
-				ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+				ctl->setSteeringAngle(-init_steering);
+				printf("init steering angle:%f\r\n",init_steering);
+				ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
 			}
 			break;
 
 		case process_status:
-			if(ctl->getAPAEnable())
+			nerest_distance = track_aly->DistanceToEnd(a_track->getPosition().getX(),a_track->getPosition().getY());
+			if( nerest_distance < 0.2f)
 			{
-                ProcV1_0(msg,ctl,a_track,t_track);
-//                RearWheelFeedback(msg,ctl,a_track,t_track);
-                nerest_distance = (a_track->getPosition() - last_track.point).Length();
-                cross_err = last_track.point.CrossProduct(a_track->getPosition());
-                if( nerest_distance < 0.1f)
-                {
-                    ctl->setDistance(0);
-                    ctl->setVelocity(0.0);
-                    ctl->setAPAEnable(0);
-                    ctl->setGear(Parking);
-                    _lat_control_status = init_status;
-                }
-                else
-                {
-
-                }
-                last_cross_err = cross_err;
+				ctl->setDistance(0);
+				ctl->setVelocity(0.0);
+				ctl->setGear(Parking);
+				_lat_control_status = init_status;
 			}
 			else
 			{
-				_lat_control_status = init_status;
+				ctl->setVelocity(10.8);
+				ctl->setGear(Drive);
+				RearWheelFeedback(msg,ctl,a_track,temp_track);
 			}
 			break;
 
 		default:
-            a_track->Init(); // 跟踪位置初始化，从坐标零点开始控制
-            ctl->SteeringAngle 		= 0;
-            ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+            ctl->setSteeringAngle(0.0);
+            ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
             _lat_control_status = init_status;
 			break;
 	}
@@ -311,3 +289,6 @@ void  LatControl::setX2(float value) { _x2 = value;}
 
 float LatControl::getSlidingVariable()            { return  _sliding_variable;}
 void  LatControl::setSlidingVariable(float value) { _sliding_variable = value;}
+
+float LatControl::getErrYaw() {return _err_yaw;}
+float LatControl::getErrCro() {return _err_cro;}

@@ -36,9 +36,9 @@
 #define MAX_DECELERATION                   (-5)
 
 // 最大转向角(rad)
-#define MAX_STEERING_ANGLE                (0.54)
+#define MAX_STEERING_ANGLE                (0.55)
 // 最大转向加速度(rad/s)
-#define MAX_STEERING_ANGLE_RATE           (0.5)
+#define MAX_STEERING_ANGLE_RATE           (0.2)
 
 // 速度修正比例系数
 #define SPEED_REVISE_RATIO               (1.01)
@@ -71,7 +71,7 @@
 #define EPS                 (0.1)
 #define MAX_ITERATION       (150)
 
-#define MATRIX_Q1           (2.0 )
+#define MATRIX_Q1           (1.0 )
 #define MATRIX_Q2           (0.5 )
 #define MATRIX_Q3           (1.0 )
 #define MATRIX_Q4           (0.5 )

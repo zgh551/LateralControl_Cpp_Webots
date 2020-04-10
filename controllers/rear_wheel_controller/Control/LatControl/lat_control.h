@@ -14,15 +14,18 @@
 #include "Control/Interface/controller.h"
 
 #include "math.h"
-#include "Common/Math/vector_2d.h"
-#include "Common/Utils/Inc/link_list.h"
-#include "Common/VehicleState/GeometricTrack/geometric_track.h"
-#include "Common/Configure/Configs/vehilce_config.h"
+#include "../../Math/vector_2d.h"
+#include "../../Math/math_utils.h"
 
-#include "Planning/Curvature/curvature.h"
+#include "../../VehicleState/GeometricTrack/geometric_track.h"
+#include "../../Configure/Configs/vehicle_config.h"
 
-#include "Common/Filter/digital_filter_coefficients.h"
-#include "Common/Filter/digital_filter.h"
+#include "../../Planning/Curvature/curvature.h"
+
+#include "../../Filter/digital_filter_coefficients.h"
+#include "../../Filter/digital_filter.h"
+
+#include "../../Control/Common/trajectory_analyzer.h"
 
 
 #define COEFFICIENT_SMV 	( 2.0f )	// 滑模变量系数
@@ -48,8 +51,6 @@ public:
 	virtual ~LatControl();
 
 	void Init() override;
-
-    float pi2pi(float angle);
 
 	float SatFunction(float x);
 
@@ -91,7 +92,7 @@ public:
      * @param t_track：目标曲线信息
      * @param last_track：车辆终点信息
      */
-    void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track,TargetTrack last_track);
+    void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TrajectoryAnalyzer *track_aly);
 
 	float getX1();
 	void  setX1(float value);
@@ -102,6 +103,9 @@ public:
 	float getSlidingVariable();
 	void  setSlidingVariable(float value);
 
+    float getErrYaw();
+    float getErrCro();
+
 private:
 
 	float _x1;
@@ -109,9 +113,12 @@ private:
 	float _sliding_variable;
 
 	LatControlStatus _lat_control_status;
-    float last_cross_err;
+    float _last_cross_err;
 
     common::DigitalFilter _digital_filter;
+
+    float _err_yaw;
+    float _err_cro;
 
 };
 
