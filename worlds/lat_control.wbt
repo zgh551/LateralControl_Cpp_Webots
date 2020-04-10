@@ -1,0 +1,251 @@
+#VRML_SIM R2020a utf8
+WorldInfo {
+  title "lateral Control"
+  ERP 0.6
+  basicTimeStep 20
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+    ContactProperties {
+      material2 "TruckWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+    ContactProperties {
+      material2 "RangeRoverSportSVRWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+    ContactProperties {
+      material2 "LincolnMKZWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+    ContactProperties {
+      material2 "ToyotaPriusWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+    ContactProperties {
+      material2 "CitroenCZeroWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+    }
+  ]
+}
+Viewpoint {
+  fieldOfView 0.785408
+  orientation 0.990531217340416 0.11842513891553953 0.06945065836223914 5.2140665634899115
+  position -11.380842327634316 156.05646037653995 86.55634464146088
+  near 1
+  follow "vehicle"
+  followSmoothness 0
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Fog {
+  color 0.38 0.35 0.32
+  visibilityRange 1000
+}
+DEF BMW BmwX5 {
+  translation 0 0.440622 0
+  color 0 0.333333 0.498039
+  controller "rear_wheel_controller"
+  supervisor TRUE
+  sensorsSlotTop [
+    Camera {
+      children [
+        Transform {
+          translation 0 0 0.05
+          rotation 1 0 0 1.57
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      width 90
+      height 45
+    }
+  ]
+  sensorsSlotCenter [
+    Display {
+      width 200
+      height 150
+    }
+    GPS {
+    }
+    Pen {
+      translation 0 -0.2 0
+      children [
+        Transform {
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 0 1
+                roughness 0.5
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.14
+                radius 0.05
+              }
+            }
+          ]
+        }
+      ]
+      inkColor 0 0 1
+      inkDensity 1
+      leadSize 0.05
+    }
+  ]
+}
+StraightRoadSegment {
+  translation 9 0.02 8
+  rotation 0 1 0 1.5708
+  name "road_straight(1)"
+  id "1"
+  startJunction "0"
+  endJunction "2"
+  width 5
+  lines [
+    RoadLine {
+      type "none"
+    }
+  ]
+  roadBorderHeight 0.1
+  rightBarrier TRUE
+  leftBarrier TRUE
+  length 20
+}
+CurvedRoadSegment {
+  translation 29 0.02 16
+  rotation 0 1 0 1.5707996938995747
+  name "road2"
+  id "2"
+  startJunction "0"
+  endJunction "1"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.35
+  rightBarrier TRUE
+  leftBarrier TRUE
+  curvatureRadius 8
+}
+Robot {
+  children [
+    DEF Ground Display {
+      children [
+        DEF G_SHAPE Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "textures/asphalt.jpg"
+              ]
+            }
+            roughness 1
+            metalness 0
+          }
+          geometry Plane {
+            size 80 80
+          }
+        }
+      ]
+      name "ground_display"
+      width 1024
+      height 1024
+    }
+  ]
+  name "ground_robot"
+  boundingObject USE G_SHAPE
+  locked TRUE
+  supervisor TRUE
+}
+Floor {
+  translation 48 0.01 0
+  size 80 80
+  tileSize 80 80
+}
+DEF TARGET_PEN Robot {
+  children [
+    Pen {
+      translation 0 0.09 0
+      children [
+        Transform {
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.333333 0.666667 0
+                roughness 0.7
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.05
+              }
+            }
+          ]
+        }
+      ]
+      inkColor 0 1 0
+      inkDensity 1
+      leadSize 0.05
+    }
+  ]
+  name "pen_robot"
+  boundingObject USE G_SHAPE
+  controller "target_pen_controller"
+  supervisor TRUE
+}
+Solid {
+  children [
+    Transform {
+      translation 0 0.01 0
+      children [
+        DEF SolidFloor Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "textures/texture_grid.png"
+              ]
+            }
+          }
+          geometry Plane {
+            size 50 50
+          }
+        }
+      ]
+    }
+  ]
+  boundingObject USE SolidFloor
+}
