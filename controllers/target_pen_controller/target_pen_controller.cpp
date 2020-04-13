@@ -31,14 +31,14 @@ int main(int argc, char **argv) {
   Curvature  *curvature_object = new Curvature();
   std::vector<TargetTrack> *_target_curvature_vectors = new std::vector<TargetTrack>;
 
-  curvature_object->GenerateCurvaturePointSets(_target_curvature_vectors,3);
+  curvature_object->GenerateCurvaturePointSets(_target_curvature_vectors,1);
   std::vector<TargetTrack>::iterator it = _target_curvature_vectors->begin();
   translation[0] = 0.0;
   translation[1] = 0.09;
   translation[2] = 0.0;
   // get the time step of the current world.
   int timeStep = (int)robot->getBasicTimeStep();
-
+  timeStep = 2;
   // You should insert a getDevice-like function in order to get the
   // instance of a device of the robot. Something like:
   //  Motor *motor = robot->getMotor("motorname");

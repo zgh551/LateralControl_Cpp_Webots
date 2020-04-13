@@ -49,8 +49,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 0.785408
-  orientation 0.03165176535978187 -0.9814369722937858 -0.18915505587854586 3.4671390872441785
-  position 3.4724896091025137 6.965381835931594 -10.541203089660158
+  orientation 0.055674060773761316 -0.986417670242076 -0.15453342289341374 3.8245094933038404
+  position 29.48882661043206 9.36818313478398 -49.227603047091954
   near 1
   follow "vehicle"
   followSmoothness 0
@@ -64,7 +64,7 @@ Fog {
   visibilityRange 1000
 }
 DEF BMW BmwX5 {
-  translation 0 0.39062 0
+  translation 15 0.39062 -35
   color 0 0.333333 0.498039
   controller "rear_wheel_controller"
   supervisor TRUE
@@ -279,9 +279,9 @@ Robot {
   supervisor TRUE
 }
 Floor {
-  translation -9 0.01 0
-  size 5 5
-  tileSize 5 5
+  translation 0 0.01 0
+  size 100 100
+  tileSize 100 100
 }
 DEF TARGET_PEN Robot {
   children [
