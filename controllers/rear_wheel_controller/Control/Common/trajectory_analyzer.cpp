@@ -51,3 +51,9 @@ double TrajectoryAnalyzer::DistanceToEnd(const double x, const double y)const
 {
     return (_trajectory_points_vector->back().point - Vector2d(x,y)).Length();
 }
+
+
+bool TrajectoryAnalyzer::isEndPoint()
+{
+    return _target_point_index == (_trajectory_points_vector->size() - 1);
+}

@@ -45,6 +45,8 @@ public:
      * @return 离最后点的距离值
      */
     double DistanceToEnd(const double x, const double y)const;
+
+    bool isEndPoint();
 private:
     std::vector<TargetTrack> *_trajectory_points_vector;
     std::vector<TargetTrack>::iterator _current_it;

@@ -62,8 +62,8 @@
 
 // lat controller configure
 #define TS                  (0.02)
-#define CF                  (40000.0)
-#define CR                  (40000.0)
+#define CF                  (155494.663)
+#define CR                  (155494.663)
 #define MASS_FL             (433)
 #define MASS_FR             (433)
 #define MASS_RL             (567)
@@ -71,10 +71,10 @@
 #define EPS                 (0.1)
 #define MAX_ITERATION       (150)
 
-#define MATRIX_Q1           (1.0 )
-#define MATRIX_Q2           (0.5 )
-#define MATRIX_Q3           (1.0 )
-#define MATRIX_Q4           (0.5 )
+#define MATRIX_Q1           (0.01 )
+#define MATRIX_Q2           (0.0 )
+#define MATRIX_Q3           (0.5 )
+#define MATRIX_Q4           (0.0 )
 
 
 /*** turn radius and the steering angle relationship ***/
