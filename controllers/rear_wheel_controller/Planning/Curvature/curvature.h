@@ -11,7 +11,7 @@
 #include "../../Control/Common/trajectory_analyzer.h"
 
 #define SAMPLE_STEP     	( 0.01f )	// 采样步长
-#define COEFFICIENT_TLS 	( 1.2f  )	// 目标曲线曲率因子
+#define COEFFICIENT_TLS 	( 0.05f  )	// 目标曲线曲率因子
 
 class Curvature
 {

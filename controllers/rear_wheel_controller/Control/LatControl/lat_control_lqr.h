@@ -16,10 +16,14 @@
 #include "../../Math/linear_quadratic_regulator.h"
 #include "../../Utils/type_init.h"
 
+// #define KINEMATICS 
+#define DYNAMICS  
+
 typedef enum _LatControl_LQR_Status
 {
     lqr_init_status = 0,
-    lqr_process_status
+    lqr_process_status,
+    lqr_stop_status
 }LatControl_LQR_Status;
 
 class LateralErr
@@ -120,7 +124,7 @@ public:
 
     void ComputeControlCommand(GeometricTrack *act_track, MessageManager *msg, TrajectoryAnalyzer track, VehicleController *ctl);
 
-    void Work(MessageManager *msg, GeometricTrack *a_track, TrajectoryAnalyzer track, VehicleController *ctl);
+    void Work(MessageManager *msg, GeometricTrack *a_track, TrajectoryAnalyzer *track, VehicleController *ctl);
 
     LateralErr* getLatError();
 private:

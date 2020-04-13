@@ -102,7 +102,7 @@ void Init(void)
  * @param none
  * @return none
  */
-void UpdateDispaly(BMWMessage *msg,GeometricTrack *ps)
+void UpdateDisplay(BMWMessage *msg,GeometricTrack *ps)
 {
   char txt[128];
   sprintf(txt,"X:%.2f[m]  Y:%.2f[m]  Yaw:%.2f[rad] ",ps->getPosition().getX(),ps->getPosition().getY(),ps->getYaw());
@@ -111,10 +111,10 @@ void UpdateDispaly(BMWMessage *msg,GeometricTrack *ps)
   sprintf(txt,"Speed:%.2f[m/s]  Steering:%.2f[deg]",msg->getVehicleMiddleSpeed()/3.6,-msg->getSteeringAngle()*16.0*57.3);
   car->setLabel(1,txt,0.05,0.91,0.07,BLUE,0,"Arial");
 
-  // sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control_lqr->getLatError()->getLateralError()*100,
-  //                                                 wb_lat_control_lqr->getLatError()->getHeadingError()*57.3);
-  sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control->getErrCro() *100 ,
-                                                      wb_lat_control->getErrYaw() *57.3);
+  sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control_lqr->getLatError()->getLateralError()*100,
+                                                      wb_lat_control_lqr->getLatError()->getHeadingError()*57.3);
+  // sprintf(txt,"LatErr:%.2f[cm] HeadErr:%.2f[deg]\r\n",wb_lat_control->getErrCro() *100 ,
+  //                                                     wb_lat_control->getErrYaw() *57.3);
                                                   
   car->setLabel(2,txt,0.05,0.87,0.07,RED,0,"Arial");
 }
@@ -125,7 +125,7 @@ void UpdateDispaly(BMWMessage *msg,GeometricTrack *ps)
  */
 void GetVehicleMessage(BMWMessage *msg)
 {
-  printf("speed:%f\r\n",car->getCurrentSpeed());
+  // printf("speed:%f\r\n",car->getCurrentSpeed());
   msg->setVehicleMiddleSpeed(car->getCurrentSpeed());
   msg->setSteeringAngle(car->getSteeringAngle());
 
@@ -161,7 +161,7 @@ void SetVehicleInformation(BMWController *ctl)
   car->setCruisingSpeed(ctl->getVelocity());
   car->setSteeringAngle(ctl->SteeringAngleControl(ctl->getSteeringAngle()));
   car->setBrakeIntensity(0.0);
-  printf("control steering:%f\r\n",ctl->getSteeringAngle());
+  // printf("control steering:%f\r\n",ctl->getSteeringAngle());
 }
 
 void VehicleInit()
@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
 
   VehicleInit();
   // gennerate target curvature
-  wb_target_curvature->GenerateCurvaturePointSets(wb_target_curvature_vectors,3);
+  wb_target_curvature->GenerateCurvaturePointSets(wb_target_curvature_vectors,1);
 
   wb_trajectory_analyzer->Init(wb_target_curvature_vectors);
 
@@ -215,11 +215,15 @@ int main(int argc, char **argv) {
     GetVehicleMessage(wb_bmw_message);
     GetVehicleLocation(wb_bmw_track);
     // Process sensor data here.
-    // wb_lat_control_lqr->ComputeControlCommand(wb_bmw_track,wb_bmw_message,*wb_trajectory_analyzer,wb_bmw_controller);
-    wb_lat_control->Work(wb_bmw_message,wb_bmw_controller,wb_bmw_track,wb_trajectory_analyzer);
+    // LQR Control
+    wb_lat_control_lqr->Work(wb_bmw_message,wb_bmw_track,wb_trajectory_analyzer,wb_bmw_controller);
+
+    // Rear Wheel Feedback control
+    // wb_lat_control->Work(wb_bmw_message,wb_bmw_controller,wb_bmw_track,wb_trajectory_analyzer);
+
     // Enter here functions to send actuator commands, like:
     SetVehicleInformation(wb_bmw_controller);
-    UpdateDispaly(wb_bmw_message,wb_bmw_track);
+    UpdateDisplay(wb_bmw_message,wb_bmw_track);
   };
 
   // Enter here exit cleanup code.

@@ -23,15 +23,29 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
     switch(type)
     {
     case 1:// 三角函数曲线
-        // index_x = 0.0;
-        // while(index_x < (M_PI/COEFFICIENT_TLS))
-        // {
+        index_x = -35.0;
+        while(index_x < 0.0)
+        {
+            temp_track.point.setX(index_x);
+            temp_track.point.setY(15.0);
+            vec->push_back(temp_track);
+            index_x = index_x + SAMPLE_STEP;
+        }
+        while(index_x < (M_PI/COEFFICIENT_TLS))
+        {
 
-        //     temp_track.point.setX(index_x);
-        //     temp_track.point.setY(1.0f*TargetLine(index_x));
-        //     vec->push_back(temp_track);
-        //     index_x = index_x + SAMPLE_STEP;
-        // }
+            temp_track.point.setX(index_x);
+            temp_track.point.setY(15.0 + 5.0f*(cosf(COEFFICIENT_TLS*index_x) - 1.0));
+            vec->push_back(temp_track);
+            index_x = index_x + SAMPLE_STEP;
+        }
+        while(index_x < 50.0)
+        {
+            temp_track.point.setX(index_x);
+            temp_track.point.setY(5.0);
+            vec->push_back(temp_track);
+            index_x = index_x + SAMPLE_STEP;
+        }
         break;
 
     case 3:// 圆
