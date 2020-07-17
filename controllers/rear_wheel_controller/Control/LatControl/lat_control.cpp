@@ -267,7 +267,7 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			}
 			else
 			{
-				ctl->setVelocity(10);
+				ctl->setVelocity(15);
 				ctl->setGear(Drive);
 				RearWheelFeedback(msg,ctl,a_track,temp_track);
 			}

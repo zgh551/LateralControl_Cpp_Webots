@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+controllers/rear_wheel_controller/*.exe
+controllers/rear_wheel_controller/build
+
+controllers/target_pen_controller/*.exe
+controllers/target_pen_controller/build

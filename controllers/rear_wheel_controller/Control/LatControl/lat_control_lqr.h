@@ -16,8 +16,8 @@
 #include "../../Math/linear_quadratic_regulator.h"
 #include "../../Utils/type_init.h"
 
-// #define KINEMATICS 
-#define DYNAMICS  
+#define KINEMATICS 
+// #define DYNAMICS  
 
 typedef enum _LatControl_LQR_Status
 {
