@@ -356,7 +356,7 @@ void LatControl_LQR::Work(MessageManager *msg, GeometricTrack *a_track, Trajecto
             }
             else
             {
-                ctl->setVelocity(20.0);
+                ctl->setVelocity(5.0);
 				ctl->setGear(Drive);
                 ComputeControlCommand(a_track,msg,*track_analyzer,ctl);
             }

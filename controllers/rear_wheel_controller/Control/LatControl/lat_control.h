@@ -11,7 +11,7 @@
 #pragma once
 
 //#include "property.h"
-#include "Control/Interface/controller.h"
+#include "../Interface/controller.h"
 
 #include "math.h"
 #include "../../Math/vector_2d.h"

@@ -214,8 +214,12 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
 	{
         delta_ctl = atanf(psi_omega * WHEEL_BASE / v_x);
         delta_ctl = delta_ctl > 0.6 ? 0.6 : delta_ctl < -0.6 ? -0.6:delta_ctl;
-
+        
+        //printf("steering angle rad: %f\r\n", delta_ctl);
+        //ctl->setSteeringAngle(-(delta_ctl));
         ctl->setSteeringAngle(-_digital_filter.Filter(delta_ctl));
+
+    //    printf("steering angle: %f\r\n", _digital_filter.Filter(delta_ctl));
 		// ctl->setSteeringAngle(-delta_ctl);
 
 		ctl->setSteeringAngleRate(MAX_STEERING_ANGLE_RATE);
@@ -258,7 +262,7 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 
 		case process_status:
 			nerest_distance = track_aly->DistanceToEnd(a_track->getPosition().getX(),a_track->getPosition().getY());
-			if( nerest_distance < 0.2f)
+			if( nerest_distance < 0.3f)
 			{
 				ctl->setDistance(0);
 				ctl->setVelocity(0.0);
@@ -267,7 +271,7 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			}
 			else
 			{
-				ctl->setVelocity(15);
+				ctl->setVelocity(7.2);
 				ctl->setGear(Drive);
 				RearWheelFeedback(msg,ctl,a_track,temp_track);
 			}

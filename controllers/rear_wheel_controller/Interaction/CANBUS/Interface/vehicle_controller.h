@@ -17,8 +17,8 @@
 #ifndef CANBUS_INTERFACE_VEHICLECONTROLLER_H_
 #define CANBUS_INTERFACE_VEHICLECONTROLLER_H_
 
-#include "Interaction/CANBUS/Interface/message_manager.h"
-#include "Utils/type_init.h"
+#include "message_manager.h"
+#include "../../../Utils/type_init.h"
 
 typedef struct _ControlCommand
 {

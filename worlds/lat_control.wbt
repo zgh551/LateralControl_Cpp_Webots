@@ -1,8 +1,9 @@
-#VRML_SIM R2020a utf8
+#VRML_SIM R2020b utf8
 WorldInfo {
   title "lateral Control"
   ERP 0.6
   basicTimeStep 20
+  coordinateSystem "NUE"
   contactProperties [
     ContactProperties {
       coulombFriction [
@@ -49,8 +50,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 0.785408
-  orientation 0.055674060773761316 -0.986417670242076 -0.15453342289341374 3.8245094933038404
-  position 29.48882661043206 9.36818313478398 -49.227603047091954
+  orientation -0.059644835767666854 0.863940980089526 0.5000484741384552 3.202920436483394
+  position -2.9187461331131703 20.2251102067365 -9.005997644921964
   near 1
   follow "vehicle"
   followSmoothness 0
@@ -64,7 +65,8 @@ Fog {
   visibilityRange 1000
 }
 DEF BMW BmwX5 {
-  translation 15 0.39062 -35
+  translation 0 0.405538 0
+  rotation 0.01531128244828688 0.999882755505912 -0.0001996789755036668 0
   color 0 0.333333 0.498039
   controller "rear_wheel_controller"
   supervisor TRUE
@@ -161,8 +163,8 @@ CurvedRoadSegment {
   leftBarrier TRUE
 }
 CurvedRoadSegment {
-  translation -10 0.02 0
-  rotation 0 1 0 -1.5707996938995747
+  translation -10 0.02 20
+  rotation 0 1 0 3.141592653589793
   name "road2(1)"
   id "2"
   startJunction "1"
@@ -179,42 +181,7 @@ CurvedRoadSegment {
   leftBarrier TRUE
 }
 CurvedRoadSegment {
-  translation -10 0.02 0
-  rotation 0 1 0 -3.141592653589793
-  name "road2(2)"
-  id "3"
-  startJunction "4"
-  endJunction "2"
-  width 5
-  lines [
-    RoadLine {
-      color 1 1 0
-      type "continuous"
-    }
-  ]
-  roadBorderHeight 0.35
-  rightBarrier TRUE
-  leftBarrier TRUE
-}
-CurvedRoadSegment {
-  translation -10 0.02 -20
-  name "road2(3)"
-  id "4"
-  startJunction "5"
-  endJunction "3"
-  width 5
-  lines [
-    RoadLine {
-      color 1 1 0
-      type "continuous"
-    }
-  ]
-  roadBorderHeight 0.35
-  rightBarrier TRUE
-  leftBarrier TRUE
-}
-CurvedRoadSegment {
-  translation -10 0.02 -20
+  translation -10 0.02 40
   rotation 0 1 0 1.5707996938995747
   name "road2(4)"
   id "5"
@@ -232,8 +199,8 @@ CurvedRoadSegment {
   leftBarrier TRUE
 }
 CurvedRoadSegment {
-  translation -10 0.02 -20
-  rotation 0 1 0 3.141592653589793
+  translation -10 0.02 20
+  rotation 0 1 0 -1.570795613280012
   name "road2(5)"
   id "6"
   startJunction "6"
@@ -283,7 +250,26 @@ Floor {
   size 100 100
   tileSize 100 100
 }
+StraightRoadSegment {
+  translation 0 0.02 40
+  name "road_straight(1)"
+  id "0"
+  startJunction "0"
+  endJunction "1"
+  width 5
+  lines [
+    RoadLine {
+      color 1 1 0
+      type "continuous"
+    }
+  ]
+  roadBorderHeight 0.1
+  rightBarrier TRUE
+  leftBarrier TRUE
+  length 8
+}
 DEF TARGET_PEN Robot {
+  translation 12.530990600585938 0.09 20.800514221191406
   children [
     Pen {
       translation 0 0.09 0

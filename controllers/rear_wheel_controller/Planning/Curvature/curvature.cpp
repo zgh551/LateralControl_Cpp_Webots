@@ -23,6 +23,7 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
     switch(type)
     {
     case 1:// 三角函数曲线
+        // initialize position (-35, 15)
         index_x = -35.0;
         while(index_x < 0.0)
         {
@@ -60,20 +61,28 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
 //        }
         gain = 10;
         index_x = M_PI2;
-        while(index_x > -M_PI)
+        while(index_x > 0)
         {
             temp_track.point.setX(gain*cosf(index_x));
-            temp_track.point.setY(gain*sinf(index_x)-gain);
+            temp_track.point.setY(gain*sinf(index_x) - gain);
             vec->push_back(temp_track);
             index_x = index_x - SAMPLE_STEP;
         }
-        index_x = 0;
-        while(index_x < (M_PI + M_PI2))
+        index_x = -M_PI;
+        while(index_x < 0)
         {
-            temp_track.point.setX(gain*cosf(index_x)-2*gain);
-            temp_track.point.setY(gain*sinf(index_x)-gain);
+            temp_track.point.setX(gain * cosf(index_x) + 2 * gain);
+            temp_track.point.setY(gain * sinf(index_x) - gain);
             vec->push_back(temp_track);
             index_x = index_x + SAMPLE_STEP;
+        }
+        index_x = M_PI;
+        while(index_x > M_PI2)
+        {
+            temp_track.point.setX(gain * cosf(index_x) + 4 * gain);
+            temp_track.point.setY(gain * sinf(index_x) - gain);
+            vec->push_back(temp_track);
+            index_x = index_x - SAMPLE_STEP;
         }
         break;
 
